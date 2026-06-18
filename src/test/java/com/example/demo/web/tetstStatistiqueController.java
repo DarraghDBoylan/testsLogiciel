@@ -31,16 +31,28 @@ class StatistiqueControllerTest {
 
     @Test
     void testGetStatistiques_Succes() throws Exception {
-        // 1. ARRANGE : On prépare un faux échantillon que le service va retourner
+        //  ARRANGE 
         Echantillon fauxEchantillon = new Echantillon(5, 20000);
         when(statistique.prixMoyen()).thenReturn(fauxEchantillon);
 
-        // 2. ACT & ASSERT : On simule le GET /statistique
+        //  ACT & ASSERT 
         mockMvc.perform(get("/statistique"))
                 .andExpect(status().isOk()) // Vérifie le code HTTP 200
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON)) // Vérifie que c'est du JSON
-                .andExpect(jsonPath("$.nombreDeVoitures").value(5)) // Vérifie le contenu JSON
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON)) // Vérifie json
+                .andExpect(jsonPath("$.nombreDeVoitures").value(5)) 
                 .andExpect(jsonPath("$.prixMoyen").value(20000));
 
         verify(statistique, times(1)).prixMoyen();
+    }
+
+
+    @Test
+    void testGetStatistiques_PasDeVoitureException() throws Exception {
+        // ARRANGE 
+        when(statistique.prixMoyen()).thenThrow(new ArithmeticException("Division par zéro"));
+
+        // ACT & ASSERT 
+
+        mockMvc.perform(get("/statistique"))
+                .andExpect(status().isInternalServerError()); // Ou le code lié à votre gestion d'exception
     }
