@@ -56,3 +56,24 @@ class StatistiqueControllerTest {
         mockMvc.perform(get("/statistique"))
                 .andExpect(status().isInternalServerError()); // Ou le code lié à votre gestion d'exception
     }
+
+
+
+
+
+    @Test
+    void testCreerVoiture() throws Exception {
+        // ARRANGE 
+        Voiture nouvelleVoiture = new Voiture("Tesla", 45000);
+        String jsonVoiture = objectMapper.writeValueAsString(nouvelleVoiture);
+
+        // ACT + ASSERT 
+        mockMvc.perform(post("/voiture")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonVoiture))
+                .andExpect(status().isOk()); // Vérifie qu e la création retourne un code 200
+        verify(statistique, times(1)).ajouter(any(Voiture.class));
+    }
+}
+
+
